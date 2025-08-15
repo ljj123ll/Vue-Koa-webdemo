@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>新增电影</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .container {
+        max-width: 800px;
+        margin: 30px auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+      .back-btn {
+        text-decoration: none;
+        color: #0d6efd;
+      }
+      .back-btn:hover {
+        text-decoration: underline;
+      }
+      .checkbox-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      /* 新增评分滑块样式 */
+      .input-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      #rating {
+        flex-grow: 1;
+      }
+      .input-group-addon {
+        min-width: 50px;
+        text-align: center;
+        padding: 6px 12px;
+        background-color: #eee;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>添加新电影</h2>
+        <a href="index.html" class="back-btn"
+          ><i class="fa fa-arrow-left"></i> 返回列表</a
+        >
+      </div>
+
+      <form id="addForm" role="form" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="title">电影名 <span style="color: red">*</span></label>
+          <input
+            type="text"
+            name="title"
+            class="form-control"
+            id="title"
+            placeholder="请输入电影名"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="year">上映年份 <span style="color: red">*</span></label>
+          <select name="year" id="year" class="form-control" required>
+            <option value="">请选择上映年份</option>
+            <script>
+              const startYear = 1900;
+              const currentYear = new Date().getFullYear();
+              for (let y = currentYear; y >= startYear; y--) {
+                document.write(`<option value="${y}">${y}</option>`);
+              }
+            </script>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="file">电影海报 <span style="color: red">*</span></label>
+          <input type="file" name="file" id="file" accept="image/*" required />
+          <p class="help-block">请上传电影海报图片</p>
+        </div>
+
+        <div class="form-group">
+          <label for="slogo">电影标语</label>
+          <input
+            type="text"
+            name="slogo"
+            class="form-control"
+            id="slogo"
+            placeholder="请输入电影标语"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="evaluate">点评人数</label>
+          <input
+            type="number"
+            name="evaluate"
+            class="form-control"
+            id="evaluate"
+            placeholder="请输入点评人数"
+            min="0"
+          />
+        </div>
+
+        <!-- 修复后的评分滑块 -->
+        <div class="form-group">
+          <label for="rating">评分 <span style="color: red">*</span></label>
+          <div class="input-group">
+            <input
+              type="range"
+              name="rating"
+              id="rating"
+              min="0"
+              max="10"
+              step="0.1"
+              value="5.0"
+              class="form-control"
+              required
+              oninput="document.getElementById('ratingValue').textContent = this.value"
+            >
+            <span class="input-group-addon" id="ratingValue">5.0</span>
+          </div>
+          <p class="help-block">拖动滑块选择评分（0.0 - 10.0）</p>
+        </div>
+
+        <div class="form-group">
+          <label>是否收藏</label>
+          <div class="checkbox-item">
+            <input
+              type="checkbox"
+              name="collected"
+              id="collected"
+              value="true"
+            />
+            <label for="collected">标记为已收藏</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>电影标签</label>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" name="label" value="美国" />
+              <label>美国</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="label" value="中国" />
+              <label>中国</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="label" value="日本" />
+              <label>日本</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="label" value="韩国" />
+              <label>韩国</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="label" value="英国" />
+              <label>英国</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="label" value="剧情" />
+              <label>剧情</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="label" value="爱情" />
+              <label>爱情</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="label" value="科幻" />
+              <label>科幻</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="label" value="奇幻" />
+              <label>奇幻</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="label" value="灾难" />
+              <label>灾难</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="label" value="动作" />
+              <label>动作</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" name="label" value="喜剧" />
+              <label>喜剧</label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">保存电影</button>
+        <button type="reset" class="btn btn-default">重置</button>
+      </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      document
+        .getElementById("addForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // 创建FormData对象
+          const formData = new FormData(this);
+
+          try {
+            // 发送POST请求
+            const response = await axios.post(
+              "http://localhost:8080/doAdd",
+              formData
+            );
+
+            if (response.data.code === 200) {
+              alert("电影添加成功！");
+              // 跳回电影列表页
+              window.location.href = "index.html";
+            } else {
+              alert("添加失败：" + response.data.msg);
+            }
+          } catch (error) {
+            console.error("添加失败", error);
+            alert("添加失败：" + (error.response?.data?.msg || error.message));
+          }
+        });
+    </script>
+  </body>
+</html>
