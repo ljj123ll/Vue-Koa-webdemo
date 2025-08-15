@@ -262,6 +262,42 @@ router.get("/detail", async ctx => {
     }
 });
 
+// 新增：更新电影信息接口（仅更新名称和标语）
+router.post("/update", async ctx => {
+  try {
+    const { id, title, slogo } = ctx.request.body;
+    
+    // 验证参数
+    if (!id) {
+      ctx.throw(400, "缺少电影ID");
+    }
+    if (!title?.trim()) {
+      ctx.throw(400, "电影名称不能为空");
+    }
+    
+    // 转换ID为ObjectId
+    const objectId = new Types.ObjectId(id);
+    
+    // 执行更新操作（仅更新title和slogo字段）
+    const res = await Top250Model.updateOne(
+      { _id: objectId },
+      { 
+        title: title.trim(), 
+        slogo: slogo || ""  // 允许标语为空
+      }
+    );
+    
+    if (res.modifiedCount > 0) {
+      ctx.body = { code: 200, msg: "更新成功" };
+    } else {
+      ctx.throw(404, "电影不存在或未做任何修改");
+    }
+  } catch (err) {
+    console.error("更新失败：", err);
+    ctx.throw(500, "更新电影信息失败：" + err.message);
+  }
+});
+
 // 应用路由
 app.use(router.routes());
 app.use(router.allowedMethods());
