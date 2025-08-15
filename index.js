@@ -138,27 +138,33 @@ router.post("/delete", async ctx => {
 });
 
 
-// 1. 获取电影列表（每页15条）
+// 修改获取电影列表的路由，支持搜索
 router.get("/top250", async ctx => {
   try {
-    // 关键：将默认limit改为15
-    const { start = 0, limit = 15 } = ctx.query; 
+    const { start = 0, limit = 15, search = "" } = ctx.query; 
     const skip = Number(start);
     const pageSize = Number(limit);
+    const searchQuery = search.trim();
 
-    const data = await Top250Model.find()
+    // 构建查询条件，如果有搜索词则添加模糊匹配
+    let query = {};
+    if (searchQuery) {
+      query.title = { $regex: searchQuery, $options: 'i' }; // i表示不区分大小写
+    }
+
+    const data = await Top250Model.find(query)
       .skip(skip)
       .limit(pageSize);
 
-    const total = await Top250Model.countDocuments();
+    const total = await Top250Model.countDocuments(query);
 
     ctx.body = {
       code: 200,
       res: data,
       total: total,
       start: skip,
-      limit: pageSize, // 返回当前页大小（15）
-      msg: "GET /top250 success"
+      limit: pageSize,
+      msg: searchQuery ? `搜索"${searchQuery}"成功` : "GET /top250 success"
     };
   } catch (err) {
     ctx.throw(500, "获取数据失败：" + err.message);
