@@ -13,6 +13,7 @@
   "packageManager": "pnpm@10.12.4",
   "dependencies": {
     "@koa/router": "^14.0.0",
+    "bcryptjs": "^3.0.2",
     "koa": "^3.0.1",
     "koa-body": "^6.0.1",
     "koa-bodyparser": "^4.4.1",

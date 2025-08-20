@@ -3,11 +3,13 @@ const Router = require("@koa/router");
 const cors = require("koa2-cors");
 const { Types } = require("mongoose");
 const Top250Model = require("./models/top250");
+const UserModel = require('./models/user');
 // 新增必要模块
 const { koaBody } = require('koa-body');
 const path = require("path"); // 处理路径
 const fs = require("fs"); // 处理文件
 const static = require("koa-static"); // 静态文件服务
+
 
 // 实例化应用和路由
 const app = new Koa();
@@ -18,6 +20,7 @@ const staticDir = path.join(__dirname, "static");
 if (!fs.existsSync(staticDir)) {
   fs.mkdirSync(staticDir, { recursive: true }); // 确保目录存在
 }
+
 
 // 中间件配置（顺序：先处理文件上传，再跨域）
 app.use(koaBody({
@@ -295,6 +298,87 @@ router.post("/update", async ctx => {
   } catch (err) {
     console.error("更新失败：", err);
     ctx.throw(500, "更新电影信息失败：" + err.message);
+  }
+});
+
+
+
+// 新增注册接口
+router.post('/register', async ctx => {
+  try {
+    const { username, email, password } = ctx.request.body;
+
+    // 基本验证
+    if (!username || !email || !password) {
+      ctx.throw(400, '用户名、邮箱和密码均为必填项');
+    }
+    if (password.length < 6) {
+      ctx.throw(400, '密码长度不能少于6位');
+    }
+
+    // 检查用户名和邮箱是否已存在
+    const existingUser = await UserModel.findOne({
+      $or: [{ username }, { email }]
+    });
+    if (existingUser) {
+      ctx.throw(400, '用户名或邮箱已被注册');
+    }
+
+    // 创建新用户
+    const user = new UserModel({
+      username,
+      email,
+      password // 会自动通过pre-save钩子加密
+    });
+    await user.save();
+
+    // 返回用户信息（不含密码）
+    const userObj = user.toObject();
+    delete userObj.password;
+    ctx.body = {
+      code: 200,
+      msg: '注册成功',
+      data: userObj
+    };
+  } catch (err) {
+    ctx.throw(500, '注册失败: ' + err.message);
+  }
+});
+
+// 新增登录接口
+router.post('/login', async ctx => {
+  try {
+    const { username, password } = ctx.request.body;
+
+    // 基本验证
+    if (!username || !password) {
+      ctx.throw(400, '用户名和密码均为必填项');
+    }
+
+    // 查找用户（支持用邮箱登录）
+    const user = await UserModel.findOne({
+      $or: [{ username }, { email: username }]
+    });
+    if (!user) {
+      ctx.throw(401, '用户名或密码错误');
+    }
+
+    // 验证密码
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      ctx.throw(401, '用户名或密码错误');
+    }
+
+    // 返回用户信息（不含密码）
+    const userObj = user.toObject();
+    delete userObj.password;
+    ctx.body = {
+      code: 200,
+      msg: '登录成功',
+      data: userObj
+    };
+  } catch (err) {
+    ctx.throw(500, '登录失败: ' + err.message);
   }
 });
 
